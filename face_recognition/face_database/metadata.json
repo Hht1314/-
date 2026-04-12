@@ -1,0 +1,15 @@
+{
+  "person_1775988774": {
+    "name": "刘琪",
+    "register_time": "2026-04-12T18:12:55.490783",
+    "feature_count": 1,
+    "last_image": "face_database\\face_images\\person_1775988774_1.jpg"
+  },
+  "person_1775989133": {
+    "name": "胡海涛",
+    "register_time": "2026-04-12T18:19:07.862607",
+    "feature_count": 3,
+    "last_image": "face_database\\face_images\\person_1775989133_3.jpg",
+    "last_update": "2026-04-12T18:19:15.729393"
+  }
+}
