@@ -103,7 +103,7 @@ python video_face_recognition.py --mode camera --register
 1. **注册人脸**
    ```bash
    # 从摄像头注册
-   python face_registration_tool.py --mode camera --name "员工A" --samples 3
+   c
    
    # 从图像注册
    python face_registration_tool.py --mode image --name "员工B" --input "employee_b.jpg"

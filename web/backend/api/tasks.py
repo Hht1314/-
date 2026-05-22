@@ -117,7 +117,7 @@ def start_processing_job(job_id: str, video_path: Path, students: list):
                         '-pix_fmt', 'yuv420p',
                         '-r', '30',
                         '-x264-params', 'keyint=60:min-keyint=60:no-scenecut=1',
-                        '-vsync', 'cfr',
+                        '-fps_mode', 'cfr',  # claude修改: FFmpeg 6.0 弃用 -vsync，改用 -fps_mode
                         '-movflags', '+faststart',
                         '-tag:v', 'avc1',
                         '-c:a', 'aac', '-b:a', '128k', '-ac', '2', '-ar', '48000',
@@ -353,11 +353,13 @@ def start_processing_job(job_id: str, video_path: Path, students: list):
                 final_msg += f"；人脸检测/识别统计：检测到 {detected_faces_total} 张人脸，识别成功 {recognized_faces_total} 张，最高相似度 {max_similarity_observed:.2f}；识别到：{', '.join(sorted(normalized_recognized)) or '无'}"
             except Exception:
                 pass
+            # ->>修改了
             storage.set_job(job_id, {
                 'status': 'completed',
                 'progress': 100,
                 'message': final_msg,
                 'result': {
+                    # ✅ 正确写法：只返回文件名！！！
                     'processed_video': f"/processed/videos/{job_id}.mp4",
                     'behavior_stats': behavior_stats,
                     'attendance': attendance,

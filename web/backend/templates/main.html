@@ -123,7 +123,7 @@
       </div>
       <div class="card video">
         <div class="title">课堂监控画面</div>
-        <video id="resultVideo" controls></video>
+        <video id="resultVideo" controls muted playsinline preload="auto"></video><!-- claude修改: 添加preload属性 -->
         <div class="overlay">
           <div>课程：<span id="ovCourse">—</span></div>
           <div>教师：<span id="ovTeacher">—</span></div>
@@ -207,10 +207,10 @@
         <button id="closeModal" class="btn btn-sec">关闭</button>
         <button id="uploadBtn" class="btn">上传并处理</button>
       </div>
-      
+
     </div>
   </div>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js" onerror="(function(){var s=document.createElement('script');s.src='https://unpkg.com/echarts@5/dist/echarts.min.js';document.head.appendChild(s);})();"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
@@ -465,7 +465,7 @@
       fd.append('course_desc', document.getElementById('courseDesc').value);
       const students = (studentsList || []).map(n => ({ name: String(n).trim() })).filter(s => s.name);
       fd.append('students', JSON.stringify(students));
-      const file = document.getElementById('videoFile').files[0];
+      const file = document.getElementById('videoFile').files[0]; // claude修改: 修复断行字符串
       if (file) fd.append('video', file);
       return fd;
     }
@@ -495,11 +495,37 @@
           if (s.status === 'completed' || s.status === 'error') {
             clearInterval(pollTimer);
             const r = await (await fetch('/api/jobs/' + jobId + '/result')).json();
-            // ->> 修复：使用后端正确的processed视频路由
+
+
+
+
             if (r.processed_video) {
-            resultVideo.src = `/processed/videos/${r.processed_video}`;
+            // claude修改: 视频加载全流程 + 错误处理
+            let videoUrl = r.processed_video + "?t=" + new Date().getTime();
+
+            // claude修改: 监听视频加载错误，输出友好提示
+            resultVideo.onerror = function() {
+                console.error("视频加载失败:", videoUrl);
+                detectStatusEl.textContent = "视频加载失败";
+            };
+            resultVideo.onloadeddata = function() {
+                console.log("视频数据已加载:", videoUrl);
+                detectStatusEl.textContent = "分析成功 - 视频已就绪";
+            };
+            resultVideo.oncanplay = function() {
+                console.log("视频可以播放:", videoUrl);
+            };
+
+            resultVideo.src = videoUrl;
             resultVideo.load();
-          }
+
+            resultVideo.play().catch(err => {
+                console.log("自动播放被浏览器限制，点击播放即可", err);
+            });
+        }
+
+
+
             const stats = r.behavior_stats || {};
             const counts = {
               normal: (stats['Normal Listening']||0),
